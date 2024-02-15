@@ -15,6 +15,14 @@
 
 /Migrations/
 
+# Ignore bin and obj folders
+**/bin/
+**/obj/
+
+# Ignore appsettings files
+/appsettings.Development.json
+/appsettings.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
