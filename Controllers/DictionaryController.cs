@@ -38,8 +38,21 @@ namespace DD_Server.Controllers2
             return dictionary;
         }
 
+        // POST: api/Dictionary/Bulk
+        [HttpPost("Bulk")]
+        public async Task<ActionResult<IEnumerable<Dictionary>>> PostDataBulk(List<Dictionary> dataList)
+        {
+            if (dataList == null || dataList.Count == 0)
+            {
+                return BadRequest("No Data provided");
+            }
+
+            _context.Dictionary.AddRange(dataList);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetDictionary), dataList);
+        }
         // PUT: api/Dictionary/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDictionary(Guid id, Dictionary dictionary)
         {
@@ -70,7 +83,6 @@ namespace DD_Server.Controllers2
         }
 
         // POST: api/Dictionary
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Dictionary>> PostDictionary(Dictionary dictionary)
         {
