@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using DD_Server.Models;
 
 namespace DD_Server.Model
 {
-    public class Audit
+    public class Audit : BaseDictionary
     {
         // public Audit(Guid id, string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, string status, DateTime timeStamp, Guid dId, int uId)
         // {
@@ -31,15 +32,7 @@ namespace DD_Server.Model
         public String Status { get; set; }
         public DateTime TimeStamp { get; set; }
         public Guid DId { get; set; }
-        public String Container { get; set; }
-        public String DataPoint { get; set; }
-        public String DbColumnName { get; set; }
-        public String FieldType { get; set; }
-        public String DbDataType { get; set; }
-        public String Definition { get; set; }
-        public String[] PossibleValues { get; set; }
-        public String[] Synonyms { get; set; }
-        public String CalculatedInfo { get; set; }
+       
         public int UId { get; set; }
         public AppUser user { get; set; }
 
