@@ -100,7 +100,7 @@ namespace DD_Server.Controllers2
             _context.Dictionary.AddRange(TempList2);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDictionary), TempList2, TempList1);
+            return await _context.Dictionary.ToListAsync();
         }
         // PUT: api/Dictionary/5
         [HttpPut("{id}")]
