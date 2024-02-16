@@ -18,5 +18,11 @@ namespace DD_Server.Persistence
             modelBuilder.Entity<AppUser>().HasMany(e => e.Requests).WithOne(e => e.user).HasForeignKey(e => e.UId);
             modelBuilder.Entity<AppUser>().HasMany(e => e.Audits).WithOne(e => e.user).HasForeignKey(e => e.UId);
         }
+
+        public Dictionary GetByDataPoint(string dataPoint)
+        {
+            return Dictionary
+                .FirstOrDefault(dictionary => dictionary.DataPoint == dataPoint);
+        }
     }
 }

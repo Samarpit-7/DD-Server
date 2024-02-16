@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DD_Server.Model;
 using DD_Server.Persistence;
+using DD_Server.Models;
 
 
 namespace DD_Server.Controllers2
@@ -18,7 +19,7 @@ namespace DD_Server.Controllers2
             _context = context;
         }
 
-       
+
         // GET: api/Dictionary
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Dictionary>>> GetDictionary()
@@ -42,17 +43,64 @@ namespace DD_Server.Controllers2
 
         // POST: api/Dictionary/Bulk
         [HttpPost("Bulk")]
-        public async Task<ActionResult<IEnumerable<Dictionary>>> PostDataBulk(List<Dictionary> dataList)
+        public async Task<ActionResult<IEnumerable<Dictionary>>> PostDataBulk(List<Dictionary> DataList)
         {
-            if (dataList == null || dataList.Count == 0)
+            if (DataList == null || DataList.Count == 0)
             {
                 return BadRequest("No Data provided");
             }
 
-            _context.Dictionary.AddRange(dataList);
+            List<Dictionary> t = _context.Dictionary.ToList();
+            if (t.Count == 0)
+            {
+                _context.Dictionary.AddRange(DataList);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetDictionary), DataList);
+            }
+
+            List<Dictionary> TempList1 = []; //For unique values
+            List<Dictionary> TempList2 = [];  //For updated values that are not exactly the same.
+            for (int i = 0; i < DataList.Count; i++)
+            {
+                Dictionary dictionary = _context.GetByDataPoint(DataList[i].DataPoint);
+
+                if (dictionary == null)
+                {
+                    TempList1.Add(DataList[i]);
+                }
+                else
+                {
+                    // Compare other fields from BaseDictionary class
+                    if (!AreEqualExceptGuid(DataList[i], dictionary))
+                    {
+                        TempList2.Add(DataList[i]);
+                        Dictionary tempDictionary = _context.GetByDataPoint(DataList[i].DataPoint);
+                        Audit audit = new();
+                        audit.Container = tempDictionary.Container;
+                        audit.DataPoint = tempDictionary.DataPoint;
+                        audit.DbColumnName = tempDictionary.DbColumnName;
+                        audit.DbDataType = tempDictionary.DbDataType;
+                        audit.Definition = tempDictionary.Definition;
+                        audit.FieldType = tempDictionary.FieldType;
+                        audit.PossibleValues = tempDictionary.PossibleValues;
+                        audit.Synonyms = tempDictionary.Synonyms;
+                        audit.CalculatedInfo = tempDictionary.CalculatedInfo;
+                        audit.DId = tempDictionary.Id;
+                        audit.Status = "Rejected";
+                        audit.UId = 1;
+                        audit.TimeStamp = DateTime.UtcNow;
+                        _context.Audits.Add(audit);
+                        _context.Dictionary.Remove(tempDictionary);
+                    }
+                }
+            }
+
+            _context.Dictionary.AddRange(TempList1);
+
+            _context.Dictionary.AddRange(TempList2);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetDictionary), dataList);
+            return CreatedAtAction(nameof(GetDictionary), TempList2, TempList1);
         }
         // PUT: api/Dictionary/5
         [HttpPut("{id}")]
@@ -113,6 +161,19 @@ namespace DD_Server.Controllers2
         private bool DictionaryExists(Guid id)
         {
             return _context.Dictionary.Any(e => e.Id == id);
+        }
+
+        static bool AreEqualExceptGuid(BaseDictionary obj1, Dictionary obj2)
+        {
+            return obj1.Container == obj2.Container &&
+                obj1.DataPoint == obj2.DataPoint &&
+                obj1.DbColumnName == obj2.DbColumnName &&
+                obj1.FieldType == obj2.FieldType &&
+                obj1.DbDataType == obj2.DbDataType &&
+                obj1.Definition == obj2.Definition &&
+                obj1.PossibleValues.SequenceEqual(obj2.PossibleValues) &&
+                obj1.Synonyms.SequenceEqual(obj2.Synonyms) &&
+                obj1.CalculatedInfo == obj2.CalculatedInfo;
         }
     }
 }
