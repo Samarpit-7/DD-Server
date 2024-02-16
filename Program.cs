@@ -12,6 +12,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
                               ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .WithOrigins("http://localhost:3000");
+            });
+        });
 
 
 var app = builder.Build();
@@ -27,7 +37,7 @@ if (app.Environment.IsDevelopment())
 
 
 
-
+app.UseCors("CorsPolicy");
 
 app.MapControllers();
 
