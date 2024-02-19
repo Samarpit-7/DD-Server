@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using DD_Server.Models;
+using DD_Server.Model;
 
-namespace DD_Server.Model
+
+namespace DD_Server.Models
 {
     public class Dictionary : BaseDictionary
     {

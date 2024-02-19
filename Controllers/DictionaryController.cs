@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using DD_Server.Model;
 using DD_Server.Persistence;
 using DD_Server.Models;
-
+using DD_Server.Helper;
 
 namespace DD_Server.Controllers2
 {
@@ -51,6 +51,8 @@ namespace DD_Server.Controllers2
             }
 
             List<Dictionary> t = _context.Dictionary.ToList();
+            ComparingExceptGuid compExceptGuid = new ComparingExceptGuid(_context);
+
             if (t.Count == 0)
             {
                 _context.Dictionary.AddRange(DataList);
@@ -58,8 +60,8 @@ namespace DD_Server.Controllers2
                 return CreatedAtAction(nameof(GetDictionary), DataList);
             }
 
-            List<Dictionary> TempList1 = []; //For unique values
-            List<Dictionary> TempList2 = [];  //For updated values that are not exactly the same.
+            List<Dictionary> TempList1 = new List<Dictionary>(); // For unique values
+            List<Dictionary> TempList2 = new List<Dictionary>(); 
             for (int i = 0; i < DataList.Count; i++)
             {
                 Dictionary dictionary = _context.GetByDataPoint(DataList[i].DataPoint);
@@ -73,11 +75,11 @@ namespace DD_Server.Controllers2
                 else
                 {
                     // Compare other fields from BaseDictionary class
-                    if (!AreEqualExceptGuid(DataList[i], dictionary))
+                    if (compExceptGuid.AreEqualExceptGuid(DataList[i], dictionary))
                     {
                         TempList2.Add(DataList[i]);
                         Dictionary tempDictionary = _context.GetByDataPoint(DataList[i].DataPoint);
-                        Audit audit = new(tempDictionary.Container,tempDictionary.DataPoint,tempDictionary.DbColumnName,tempDictionary.FieldType,tempDictionary.DbDataType,tempDictionary.Definition,tempDictionary.PossibleValues,tempDictionary.Synonyms,tempDictionary.CalculatedInfo,"Rejected",tempDictionary.TimeStamp,tempDictionary.Id,1);
+                        Audit audit = new(tempDictionary.Container,tempDictionary.DataPoint,tempDictionary.DbColumnName,tempDictionary.FieldType,tempDictionary.DbDataType,tempDictionary.Definition,tempDictionary.PossibleValues,tempDictionary.Synonyms,tempDictionary.CalculatedInfo,"Rejected",tempDictionary.TimeStamp,tempDictionary.Id,tempDictionary.UId);
                         _context.Audits.Add(audit);
                         _context.Dictionary.Remove(tempDictionary);
                     }
@@ -152,17 +154,5 @@ namespace DD_Server.Controllers2
             return _context.Dictionary.Any(e => e.Id == id);
         }
 
-        static bool AreEqualExceptGuid(BaseDictionary obj1, Dictionary obj2)
-        {
-            return obj1.Container == obj2.Container &&
-                obj1.DataPoint == obj2.DataPoint &&
-                obj1.DbColumnName == obj2.DbColumnName &&
-                obj1.FieldType == obj2.FieldType &&
-                obj1.DbDataType == obj2.DbDataType &&
-                obj1.Definition == obj2.Definition &&
-                obj1.PossibleValues.SequenceEqual(obj2.PossibleValues) &&
-                obj1.Synonyms.SequenceEqual(obj2.Synonyms) &&
-                obj1.CalculatedInfo == obj2.CalculatedInfo;
-        }
     }
 }

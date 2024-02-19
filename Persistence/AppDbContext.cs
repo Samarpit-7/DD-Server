@@ -1,5 +1,6 @@
 
 using DD_Server.Model;
+using DD_Server.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DD_Server.Persistence

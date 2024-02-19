@@ -1,5 +1,7 @@
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using DD_Server.Models;
 
 
 namespace DD_Server.Model
