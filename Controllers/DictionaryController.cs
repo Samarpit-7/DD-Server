@@ -64,6 +64,8 @@ namespace DD_Server.Controllers2
             {
                 Dictionary dictionary = _context.GetByDataPoint(DataList[i].DataPoint);
 
+                dictionary.TimeStamp = DateTime.UtcNow;
+
                 if (dictionary == null)
                 {
                     TempList1.Add(DataList[i]);
@@ -75,20 +77,7 @@ namespace DD_Server.Controllers2
                     {
                         TempList2.Add(DataList[i]);
                         Dictionary tempDictionary = _context.GetByDataPoint(DataList[i].DataPoint);
-                        Audit audit = new();
-                        audit.Container = tempDictionary.Container;
-                        audit.DataPoint = tempDictionary.DataPoint;
-                        audit.DbColumnName = tempDictionary.DbColumnName;
-                        audit.DbDataType = tempDictionary.DbDataType;
-                        audit.Definition = tempDictionary.Definition;
-                        audit.FieldType = tempDictionary.FieldType;
-                        audit.PossibleValues = tempDictionary.PossibleValues;
-                        audit.Synonyms = tempDictionary.Synonyms;
-                        audit.CalculatedInfo = tempDictionary.CalculatedInfo;
-                        audit.DId = tempDictionary.Id;
-                        audit.Status = "Rejected";
-                        audit.UId = 1;
-                        audit.TimeStamp = DateTime.UtcNow;
+                        Audit audit = new(tempDictionary.Container,tempDictionary.DataPoint,tempDictionary.DbColumnName,tempDictionary.FieldType,tempDictionary.DbDataType,tempDictionary.Definition,tempDictionary.PossibleValues,tempDictionary.Synonyms,tempDictionary.CalculatedInfo,"Rejected",tempDictionary.TimeStamp,tempDictionary.Id,1);
                         _context.Audits.Add(audit);
                         _context.Dictionary.Remove(tempDictionary);
                     }

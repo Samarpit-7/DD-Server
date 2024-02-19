@@ -29,10 +29,11 @@ namespace DD_Server.Model
         }
 
         [Key]
-        public Guid Id { get; set; }
-
-       
+        public Guid Id { get; set; }       
         public bool IsLocked { get; set; } = false;
+        public DateTime TimeStamp { get; set; }
+        public int UId { get; set; } 
+        public AppUser User { get; set; }
 
     }
 }
