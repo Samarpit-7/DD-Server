@@ -57,7 +57,7 @@ namespace DD_Server.Controllers2
                 return
                 obj;
             }).ToList();
-            ComparingExceptGuid compExceptGuid = new ComparingExceptGuid(_context);
+            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
 
             if (t.Count == 0)
             {
@@ -81,11 +81,11 @@ namespace DD_Server.Controllers2
                 else
                 {
                     // Compare other fields from BaseDictionary class
-                    if (compExceptGuid.AreEqualExceptGuid(DataList[i], dictionary))
+                    if (HelperFunction.AreEqualExceptGuid(DataList[i], dictionary))
                     {
                         TempList2.Add(DataList[i]);
                         Dictionary tempDictionary = _context.GetByDataPoint(DataList[i].DataPoint);
-                        Audit audit = new(tempDictionary.Container, tempDictionary.DataPoint, tempDictionary.DbColumnName, tempDictionary.FieldType, tempDictionary.DbDataType, tempDictionary.Definition, tempDictionary.PossibleValues, tempDictionary.Synonyms, tempDictionary.CalculatedInfo, "Rejected", tempDictionary.TimeStamp, tempDictionary.Id, tempDictionary.UId);
+                        Audit audit = HelperFunction.Convert_Dictionary_to_Audit(tempDictionary);
                         _context.Audits.Add(audit);
                         _context.Dictionary.Remove(tempDictionary);
                     }
@@ -107,9 +107,10 @@ namespace DD_Server.Controllers2
             {
                 return BadRequest();
             }
+            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
 
             var tempDictionary = _context.Dictionary.Find(id);
-            Audit audit = new(tempDictionary.Container, tempDictionary.DataPoint, tempDictionary.DbColumnName, tempDictionary.FieldType, tempDictionary.DbDataType, tempDictionary.Definition, tempDictionary.PossibleValues, tempDictionary.Synonyms, tempDictionary.CalculatedInfo, "Rejected", tempDictionary.TimeStamp, tempDictionary.Id, tempDictionary.UId);
+            Audit audit = HelperFunction.Convert_Dictionary_to_Audit(tempDictionary);
             _context.Audits.Add(audit);
 
             _context.Entry(dictionary).State = EntityState.Modified;
@@ -152,8 +153,8 @@ namespace DD_Server.Controllers2
             {
                 return NotFound();
             }
-            Audit audit = new(dictionary.Container, dictionary.DataPoint, dictionary.DbColumnName, dictionary.FieldType, dictionary.DbDataType, dictionary.Definition, dictionary.PossibleValues, dictionary.Synonyms, dictionary.CalculatedInfo, "Rejected", dictionary.TimeStamp, dictionary.Id, dictionary.UId);
-            _context.Dictionary.Remove(dictionary);
+            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
+            Audit audit = HelperFunction.Convert_Dictionary_to_Audit(dictionary);
             _context.Audits.Add(audit);
             await _context.SaveChangesAsync();
 

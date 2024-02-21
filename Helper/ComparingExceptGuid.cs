@@ -31,5 +31,41 @@ namespace DD_Server.Helper
             obj1.Synonyms != null && obj2.Synonyms != null && obj1.Synonyms.SequenceEqual(obj2.Synonyms)) &&
             obj1.CalculatedInfo == obj2.CalculatedInfo;
         }
+
+        public Audit Convert_Dictionary_to_Audit(Dictionary tempDictionary) {
+            Audit Newaudit = new(
+                tempDictionary.Container,
+                tempDictionary.DataPoint,
+                tempDictionary.DbColumnName,
+                tempDictionary.FieldType,
+                tempDictionary.DbDataType,
+                tempDictionary.Definition,
+                tempDictionary.PossibleValues,
+                tempDictionary.Synonyms,
+                tempDictionary.CalculatedInfo,
+                "Rejected",
+                tempDictionary.TimeStamp,
+                tempDictionary.Id,
+                tempDictionary.UId);
+            return Newaudit;
+        }
+
+        public Request Convert_Dictionary_to_Request(Dictionary tempDictionary) {
+            Request NewRequest = new(
+                "Rejected",
+                tempDictionary.TimeStamp,
+                tempDictionary.Container,
+                tempDictionary.DataPoint,
+                tempDictionary.DbColumnName,
+                tempDictionary.FieldType,
+                tempDictionary.DbDataType,
+                tempDictionary.Definition,
+                tempDictionary.PossibleValues,
+                tempDictionary.Synonyms,
+                tempDictionary.CalculatedInfo,    
+                tempDictionary.Id,
+                tempDictionary.UId);
+            return NewRequest;
+        }
     }
 }
