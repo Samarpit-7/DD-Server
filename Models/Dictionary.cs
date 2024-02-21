@@ -9,9 +9,9 @@ namespace DD_Server.Models
         {
         }
 
-        public Dictionary(Guid id, string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, bool isLocked)
+        public Dictionary(string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, DateTime timeStamp, int uId )
         {
-            Id = id;
+
             Container = container;
             DataPoint = dataPoint;
             DbColumnName = dbColumnName;
@@ -21,7 +21,8 @@ namespace DD_Server.Models
             PossibleValues = possibleValues;
             Synonyms[0] = dataPoint;
             CalculatedInfo = calculatedInfo;
-            IsLocked = isLocked;
+            TimeStamp = timeStamp;
+            UId = uId;
         }
 
         [Key]

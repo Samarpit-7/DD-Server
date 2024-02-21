@@ -25,6 +25,18 @@ namespace DD_Server.Controllers2
         {
             return await _context.Dictionary.ToListAsync();
         }
+        [HttpGet("audit/{id}")]
+        public async Task<ActionResult<Audit>> GetAudit(Guid id)
+        {
+            var audit = await _context.Audits.FindAsync(id);
+
+            if (audit == null)
+            {
+                return NotFound();
+            }
+
+            return audit;
+        }
 
         // GET: api/Dictionary/5
         [HttpGet("{id}")]
@@ -129,6 +141,35 @@ namespace DD_Server.Controllers2
             return Ok(dictionary);
         }
 
+        [HttpPut("Revert/{id}")]
+        public async Task<IActionResult> RevertDictionary(Guid id, Audit audit)
+        {
+            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
+            var dictionary = _context.Dictionary.Find(audit.DId);
+
+            if (dictionary == null)
+            {
+                var obj = HelperFunction.Convert_Audit_to_Dictionary(audit);
+                _context.Dictionary.Add(obj);
+                   await _context.SaveChangesAsync();
+                return Ok(obj);
+            }
+
+            dictionary.TimeStamp = audit.TimeStamp;
+            dictionary.Container = audit.Container;
+            dictionary.PossibleValues = audit.PossibleValues;
+            dictionary.CalculatedInfo = audit.CalculatedInfo;
+            dictionary.UId = audit.UId;
+            dictionary.DbColumnName = audit.DbColumnName;
+            dictionary.DbDataType = audit.DbDataType;
+            dictionary.Definition = audit.Definition;
+            dictionary.Synonyms = audit.Synonyms;
+            _context.Entry(dictionary).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+
+            return Ok(dictionary);
+        }
         // POST: api/Dictionary
         [HttpPost]
         public async Task<ActionResult<Dictionary>> PostDictionary(Dictionary dictionary)
