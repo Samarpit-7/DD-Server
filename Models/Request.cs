@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using DD_Server.Models;
 
-namespace DD_Server.Model
+using System.ComponentModel.DataAnnotations;
+
+
+namespace DD_Server.Models
 {
     public class Request : BaseDictionary
     {

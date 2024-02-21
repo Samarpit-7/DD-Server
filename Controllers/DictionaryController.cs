@@ -1,7 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using DD_Server.Model;
 using DD_Server.Persistence;
 using DD_Server.Models;
 using DD_Server.Helper;
