@@ -9,9 +9,8 @@ namespace DD_Server.Model
 {
     public class Request : BaseDictionary
     {
-        public Request(Guid id, string status, DateTime timeStamp, string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, Guid dId, int uId)
+        public Request(string status, DateTime timeStamp, string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, Guid dId, int uId)
         {
-            Id = id;
             Status = status;
             TimeStamp = timeStamp;
             Container = container;
@@ -33,7 +32,6 @@ namespace DD_Server.Model
         public DateTime TimeStamp { get; set; }
         public Guid DId { get; set; }
         public int UId { get; set; }
-
         public AppUser user { get; set; }
 
     }

@@ -51,6 +51,12 @@ namespace DD_Server.Controllers2
             }
 
             List<Dictionary> t = _context.Dictionary.ToList();
+            DataList = DataList.Select(obj =>
+            {
+                obj.TimeStamp = DateTime.UtcNow;
+                return
+                obj;
+            }).ToList();
             ComparingExceptGuid compExceptGuid = new ComparingExceptGuid(_context);
 
             if (t.Count == 0)
@@ -61,12 +67,12 @@ namespace DD_Server.Controllers2
             }
 
             List<Dictionary> TempList1 = new List<Dictionary>(); // For unique values
-            List<Dictionary> TempList2 = new List<Dictionary>(); 
+            List<Dictionary> TempList2 = new List<Dictionary>();
             for (int i = 0; i < DataList.Count; i++)
             {
                 Dictionary dictionary = _context.GetByDataPoint(DataList[i].DataPoint);
 
-                dictionary.TimeStamp = DateTime.UtcNow;
+                DataList[i].TimeStamp = DateTime.UtcNow;
 
                 if (dictionary == null)
                 {
@@ -79,7 +85,7 @@ namespace DD_Server.Controllers2
                     {
                         TempList2.Add(DataList[i]);
                         Dictionary tempDictionary = _context.GetByDataPoint(DataList[i].DataPoint);
-                        Audit audit = new(tempDictionary.Container,tempDictionary.DataPoint,tempDictionary.DbColumnName,tempDictionary.FieldType,tempDictionary.DbDataType,tempDictionary.Definition,tempDictionary.PossibleValues,tempDictionary.Synonyms,tempDictionary.CalculatedInfo,"Rejected",tempDictionary.TimeStamp,tempDictionary.Id,tempDictionary.UId);
+                        Audit audit = new(tempDictionary.Container, tempDictionary.DataPoint, tempDictionary.DbColumnName, tempDictionary.FieldType, tempDictionary.DbDataType, tempDictionary.Definition, tempDictionary.PossibleValues, tempDictionary.Synonyms, tempDictionary.CalculatedInfo, "Rejected", tempDictionary.TimeStamp, tempDictionary.Id, tempDictionary.UId);
                         _context.Audits.Add(audit);
                         _context.Dictionary.Remove(tempDictionary);
                     }
@@ -101,6 +107,10 @@ namespace DD_Server.Controllers2
             {
                 return BadRequest();
             }
+
+            var tempDictionary = _context.Dictionary.Find(id);
+            Audit audit = new(tempDictionary.Container, tempDictionary.DataPoint, tempDictionary.DbColumnName, tempDictionary.FieldType, tempDictionary.DbDataType, tempDictionary.Definition, tempDictionary.PossibleValues, tempDictionary.Synonyms, tempDictionary.CalculatedInfo, "Rejected", tempDictionary.TimeStamp, tempDictionary.Id, tempDictionary.UId);
+            _context.Audits.Add(audit);
 
             _context.Entry(dictionary).State = EntityState.Modified;
 
@@ -142,11 +152,12 @@ namespace DD_Server.Controllers2
             {
                 return NotFound();
             }
-
+            Audit audit = new(dictionary.Container, dictionary.DataPoint, dictionary.DbColumnName, dictionary.FieldType, dictionary.DbDataType, dictionary.Definition, dictionary.PossibleValues, dictionary.Synonyms, dictionary.CalculatedInfo, "Rejected", dictionary.TimeStamp, dictionary.Id, dictionary.UId);
             _context.Dictionary.Remove(dictionary);
+            _context.Audits.Add(audit);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(audit);
         }
 
         private bool DictionaryExists(Guid id)
