@@ -65,35 +65,35 @@ namespace DD_Server.Controllers2
                 return CreatedAtAction(nameof(GetDictionary), DataList);
             }
 
-            List<Dictionary> TempList1 = new List<Dictionary>(); // For unique values
-            List<Dictionary> TempList2 = new List<Dictionary>();
+            List<Dictionary> TempList1 = [];
             for (int i = 0; i < DataList.Count; i++)
             {
                 Dictionary dictionary = _context.GetByDataPoint(DataList[i].DataPoint);
 
-                DataList[i].TimeStamp = DateTime.UtcNow;
+
+
 
                 if (dictionary == null)
                 {
                     TempList1.Add(DataList[i]);
                 }
-                else
+                else if (!HelperFunction.AreEqualExceptGuid(DataList[i], dictionary))
                 {
-                    // Compare other fields from BaseDictionary class
-                    if (HelperFunction.AreEqualExceptGuid(DataList[i], dictionary))
-                    {
-                        TempList2.Add(DataList[i]);
-                        Dictionary tempDictionary = _context.GetByDataPoint(DataList[i].DataPoint);
-                        Audit audit = HelperFunction.Convert_Dictionary_to_Audit(tempDictionary);
-                        _context.Audits.Add(audit);
-                        _context.Dictionary.Remove(tempDictionary);
-                    }
+                    dictionary.TimeStamp = DataList[i].TimeStamp;
+                    dictionary.Container = DataList[i].Container;
+                    dictionary.PossibleValues = DataList[i].PossibleValues;
+                    dictionary.CalculatedInfo = DataList[i].CalculatedInfo;
+                    dictionary.UId = DataList[i].UId;
+                    dictionary.DbColumnName = DataList[i].DbColumnName;
+                    dictionary.DbDataType = DataList[i].DbDataType;
+                    dictionary.Definition = DataList[i].Definition;
+                    dictionary.Synonyms = DataList[i].Synonyms;
+                    _context.Entry(dictionary).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
                 }
             }
 
             _context.Dictionary.AddRange(TempList1);
-
-            _context.Dictionary.AddRange(TempList2);
             await _context.SaveChangesAsync();
 
             return await _context.Dictionary.ToListAsync();
@@ -106,11 +106,7 @@ namespace DD_Server.Controllers2
             {
                 return BadRequest();
             }
-            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
 
-            var tempDictionary = _context.Dictionary.Find(id);
-            Audit audit = HelperFunction.Convert_Dictionary_to_Audit(tempDictionary);
-            _context.Audits.Add(audit);
 
             _context.Entry(dictionary).State = EntityState.Modified;
 
@@ -130,7 +126,7 @@ namespace DD_Server.Controllers2
                 }
             }
 
-            return NoContent();
+            return Ok(dictionary);
         }
 
         // POST: api/Dictionary
@@ -152,12 +148,10 @@ namespace DD_Server.Controllers2
             {
                 return NotFound();
             }
-            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
-            Audit audit = HelperFunction.Convert_Dictionary_to_Audit(dictionary);
-            _context.Audits.Add(audit);
+            _context.Dictionary.Remove(dictionary);
             await _context.SaveChangesAsync();
 
-            return Ok(audit);
+            return Ok(id);
         }
 
         private bool DictionaryExists(Guid id)

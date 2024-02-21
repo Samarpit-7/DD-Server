@@ -10,7 +10,7 @@ namespace DD_Server.Models
         {
         }
 
-        public Audit(string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, string status, DateTime timeStamp, Guid dId, int uId)
+        public Audit(string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, string action, DateTime timeStamp, Guid dId, int uId)
         {
             Container = container;
             DataPoint = dataPoint;
@@ -21,7 +21,7 @@ namespace DD_Server.Models
             PossibleValues = possibleValues;
             Synonyms = synonyms;
             CalculatedInfo = calculatedInfo;
-            Status = status;
+            Action = action;
             TimeStamp = timeStamp;
             DId = dId;
             UId = uId;
@@ -29,7 +29,7 @@ namespace DD_Server.Models
 
         [Key]
         public Guid Id { get; set; }
-        public String Status { get; set; }
+        public String Action { get; set; }
         public DateTime TimeStamp { get; set; }
         public Guid DId { get; set; }
         public int UId { get; set; }

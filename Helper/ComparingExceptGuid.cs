@@ -16,7 +16,7 @@ namespace DD_Server.Helper
         public bool AreEqualExceptGuid(BaseDictionary obj1, Dictionary obj2)
         {
             return obj1.Container == obj2.Container &&
-            obj1.DataPoint == obj2.DataPoint &&
+            // obj1.DataPoint == obj2.DataPoint &&
             obj1.DbColumnName == obj2.DbColumnName &&
             obj1.FieldType == obj2.FieldType &&
             obj1.DbDataType == obj2.DbDataType &&
@@ -45,6 +45,7 @@ namespace DD_Server.Helper
                 tempDictionary.UId);
             return Newaudit;
         }
+
 
         public Request Convert_Dictionary_to_Request(Dictionary tempDictionary) {
             Request NewRequest = new(
