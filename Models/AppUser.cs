@@ -26,9 +26,7 @@ namespace DD_Server.Models
         public string email { get; set; }
         public string password { get; set; }
         public string role { get; set; } = "User";
-        public ICollection<Request> Requests { get; } = new List<Request>();
-        public ICollection<Audit> Audits { get; } = new List<Audit>();
-        public ICollection<Dictionary> Dictionary { get; } = new List<Dictionary>();
+      
 
     }
 }

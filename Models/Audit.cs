@@ -33,7 +33,7 @@ namespace DD_Server.Models
         public DateTime TimeStamp { get; set; }
         public Guid DId { get; set; }
         public int UId { get; set; }
-        public AppUser user { get; set; }
+        public virtual AppUser User { get; set; }
 
     }
 }

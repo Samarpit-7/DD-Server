@@ -30,7 +30,7 @@ namespace DD_Server.Models
         public bool IsLocked { get; set; } = false;
         public DateTime TimeStamp { get; set; }
         public int UId { get; set; } 
-        public AppUser User { get; set; }
+        public virtual AppUser User { get; set; }
 
     }
 }
