@@ -26,6 +26,7 @@ namespace DD_Server.Models
         [Key]
         public Guid Id { get; set; }
         public String Status { get; set; } = "Pending";
+        public String Action { get; set; }
         public DateTime TimeStamp { get; set; }
         public Guid DId { get; set; }
         public int UId { get; set; }
