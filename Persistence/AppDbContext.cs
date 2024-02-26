@@ -22,7 +22,7 @@ namespace DD_Server.Persistence
                 .HasIndex(d => d.DataPoint)
                 .IsUnique();
         }
-            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
         }
