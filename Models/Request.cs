@@ -6,9 +6,10 @@ namespace DD_Server.Models
 {
     public class Request : BaseDictionary
     {
-        public Request(string status, DateTime timeStamp, string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, Guid dId, int uId)
+        public Request(string status,String action, DateTime timeStamp, string container, string dataPoint, string dbColumnName, string fieldType, string dbDataType, string definition, string[] possibleValues, string[] synonyms, string calculatedInfo, Guid dId, int uId)
         {
             Status = status;
+            Action = action;
             TimeStamp = timeStamp;
             Container = container;
             DataPoint = dataPoint;

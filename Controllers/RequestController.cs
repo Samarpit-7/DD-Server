@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DD_Server.Models;
 using DD_Server.Persistence;
+using DD_Server.Helper;
 
 namespace DD_Server.Controllers
 {
@@ -25,6 +26,57 @@ namespace DD_Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Request>>> GetRequests()
         {
+            return await _context.Requests.ToListAsync();
+        }
+
+        // POST: api/Dictionary/Bulk
+        [HttpPost("Bulk")]
+        public async Task<ActionResult<IEnumerable<Request>>> PostDataBulk(List<Dictionary> DataList)
+        {
+            if (DataList == null || DataList.Count == 0)
+            {
+                return BadRequest("No Data provided");
+            }
+
+            List<Dictionary> t = _context.Dictionary.ToList();
+            DataList = DataList.Select(obj =>
+            {
+                obj.TimeStamp = DateTime.UtcNow;
+                return
+                obj;
+            }).ToList();
+            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
+
+            List<Request> r = [];
+
+            if (t.Count == 0)
+            {
+                for(int i=0 ; i<DataList.Count ; i++)
+                {
+                    r.Add(HelperFunction.Convert_Dictionary_to_Request(DataList[i],"INSERT"));
+                }
+                _context.Requests.AddRange(r);
+                await _context.SaveChangesAsync();
+                return Ok(r);
+            }
+
+            for (int i = 0; i < DataList.Count; i++)
+            {
+                Dictionary dictionary = _context.GetByDataPoint(DataList[i].DataPoint);
+
+                if (dictionary == null)
+                {
+                    _context.Requests.Add(HelperFunction.Convert_Dictionary_to_Request(DataList[i],"INSERT"));
+                    await _context.SaveChangesAsync();
+                }
+                else if (!HelperFunction.AreEqualExceptGuid(DataList[i], dictionary) )
+                {
+                    _context.Requests.Add(HelperFunction.Convert_Dictionary_to_Request(DataList[i],"UPDATE"));
+                    dictionary.IsLocked = true;
+                    _context.Entry(dictionary).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+            }
             return await _context.Requests.ToListAsync();
         }
 
@@ -74,15 +126,42 @@ namespace DD_Server.Controllers
         }
 
         // POST: api/Request
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Request>> PostRequest(Request request)
         {
             _context.Requests.Add(request);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetRequest", new { id = request.Id }, request);
         }
+
+        [HttpPost("Delete")]
+        public async Task<ActionResult<Request>> PostDeleteRequest(List<Guid> DataList)
+        {
+            if(DataList.Count == 0)
+            {
+                return NoContent();
+            }
+            ComparingExceptGuid HelperFunction = new ComparingExceptGuid(_context);
+            List<Request> request = [];
+            for(int i=0 ; i<DataList.Count ; i++)
+            {
+                Dictionary dictionary = _context.Dictionary.Find(DataList[i]);
+                if(dictionary == null)
+                {
+                    return BadRequest("No Records Found");
+                }
+                else if(!dictionary.IsLocked){
+                    request.Add(HelperFunction.Convert_Dictionary_to_Request(dictionary,"DELETE"));
+                    dictionary.IsLocked = true;
+                    _context.Entry(dictionary).State = EntityState.Modified;
+                    _context.SaveChanges();
+                }
+            }
+            _context.Requests.AddRange(request);
+            await _context.SaveChangesAsync();
+            return Ok(request);
+        }
+
 
         // DELETE: api/Request/5
         [HttpDelete("{id}")]

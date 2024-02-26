@@ -69,10 +69,11 @@ namespace DD_Server.Helper
         }
 
 
-        public Request Convert_Dictionary_to_Request(Dictionary tempDictionary)
+        public Request Convert_Dictionary_to_Request(Dictionary tempDictionary,String action)
         {
             Request NewRequest = new(
-                "Rejected",
+                "Pending",
+                action,
                 tempDictionary.TimeStamp,
                 tempDictionary.Container,
                 tempDictionary.DataPoint,
