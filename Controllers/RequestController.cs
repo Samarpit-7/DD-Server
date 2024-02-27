@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DD_Server.Models;
@@ -27,6 +23,14 @@ namespace DD_Server.Controllers
         public async Task<ActionResult<IEnumerable<Request>>> GetRequests()
         {
             return await _context.Requests.ToListAsync();
+        }
+
+        [HttpGet("WithUser/{Id}")] 
+        public async Task<List<Request>> GetDictionariesByUserId(int Id)
+        {
+            return await _context.Requests
+                .Where(d => d.UId == Id)
+                .ToListAsync();
         }
 
         // POST: api/Dictionary/Bulk
